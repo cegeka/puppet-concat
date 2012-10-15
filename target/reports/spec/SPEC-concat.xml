@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite time="0.074841" errors="1" failures="0" name="concat" skipped="0" tests="1">
+  <testcase time="0.074403" name="concat ">
+    <failure type="Puppet::Error" message="Could not find class concat for svintcodem01.intra.cegeka.be at line 3 on node svintcodem01.intra.cegeka.be">
+Could not find class concat for svintcodem01.intra.cegeka.be at line 3 on node svintcodem01.intra.cegeka.be (Puppet::Error)
+Puppet::Error:
+Could not find class concat for svintcodem01.intra.cegeka.be at line 3 on node svintcodem01.intra.cegeka.be
+     ./spec/classes/puppet-concat_spec.rb:6    </failure>
+  </testcase>
+  <system-out>
+  </system-out>
+  <system-err>
+  </system-err>
+</testsuite>
