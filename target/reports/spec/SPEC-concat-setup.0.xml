@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite time="0.152165" errors="0" failures="0" name="concat::setup" skipped="0" tests="1">
-  <testcase time="0.1518" name="concat::setup ">
-  </testcase>
-  <system-out>
-  </system-out>
-  <system-err>
-  </system-err>
-</testsuite>
