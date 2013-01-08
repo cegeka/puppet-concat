@@ -63,6 +63,10 @@
 # Sets up so that you can use fragments to build a final config file,
 #
 # OPTIONS:
+#  - path       The path to the final file. Use this in case you want to
+#               differentiate between the name of a resource and the file path.
+#               Note: Use the name you provided in the target of your
+#               fragments.
 #  - mode       The mode of the final file
 #  - owner      Who will own the file
 #  - group      Who will own the file
@@ -71,6 +75,8 @@
 #               that it is built by puppet
 #  - backup     Controls the filebucketing behavior of the final file and
 #               see File type reference for its use.  Defaults to 'puppet'
+#  - replace    Whether to replace a file that already exists on the local
+#               system
 #
 # ACTIONS:
 #  - Creates fragment directories if it didn't exist already
@@ -92,12 +98,14 @@
 #  - The final file can be referened as File['/path/to/file'] or
 #     File['concat_/path/to/file']
 define concat(
+  $path = $name,
   $mode = '0644',
   $owner = $::id,
   $group = $concat::setup::root_group,
   $warn = false,
   $force = false,
   $backup = 'puppet',
+  $replace = true,
   $gnu = true,
   $order='alpha'
   ) {
@@ -138,12 +146,14 @@ define concat(
         default: { fail("Improper 'order' value given to concat: ${order}") }
     }
 
-    File{
-        owner  => $::id,
-        group  => $group,
-        mode   => $mode,
-        backup => $backup
+    File {
+        owner   => $::id,
+        group   => $group,
+        mode    => $mode,
+        backup  => $backup,
+        replace => $replace,
     }
+
     $real_source = $version ? {
       24      => 'puppet:///concat/null',
       default => undef,
@@ -168,6 +178,7 @@ define concat(
 
         $name:
             ensure   => present,
+            path     => $path,
             source   => "${fragdir}/${concat_name}",
             owner    => $owner,
             group    => $group,
