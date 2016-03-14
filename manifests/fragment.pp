@@ -1,62 +1,56 @@
-# Puts a file fragment into a directory previous setup using concat
+# == Define: concat::fragment
 #
-# OPTIONS:
-#   - target    The file that these fragments belong to
-#   - content   If present puts the content into the file
-#   - source    If content was not specified, use the source
-#   - order     By default all files gets a 10_ prefix in the directory
-#               you can set it to anything else using this to influence the
-#               order of the content in the file
-#   - ensure    Present/Absent or destination to a file to include another file
-#   - mode      Mode for the file
-#   - owner     Owner of the file
-#   - group     Owner of the file
-#   - backup    Controls the filebucketing behavior of the final file and
-#               see File type reference for its use.  Defaults to 'puppet'
+# Creates a concat_fragment in the catalogue
+#
+# === Options:
+#
+# [*target*]
+#   The file that these fragments belong to
+# [*content*]
+#   If present puts the content into the file
+# [*source*]
+#   If content was not specified, use the source
+# [*order*]
+#   By default all files gets a 10_ prefix in the directory you can set it to
+#   anything else using this to influence the order of the content in the file
+#
 define concat::fragment(
     $target,
-    $content='',
-    $source='',
-    $order=10,
-    $ensure = 'present',
-    $mode = '0644',
-    $owner = $::id,
-    $group = $concat::setup::root_group,
-    $backup = 'puppet'
-    ) {
-    $safe_name = regsubst($name, '/', '_', 'G')
-    $safe_target_name = regsubst($target, '/', '_', 'G')
-    $concatdir = $concat::setup::concatdir
-    $fragdir = "${concatdir}/${safe_target_name}"
+    $ensure  = undef,
+    $content = undef,
+    $source  = undef,
+    $order   = '10',
+) {
+  validate_string($target)
 
-    # if content is passed, use that, else if source is passed use that
-    # if neither passed, but $ensure is in symlink form, make a symlink
-    case $content {
-      '': {
-        case $source {
-          '': {
-            case $ensure {
-              '', 'absent', 'present', 'file', 'directory': {
-                crit('No content, source or symlink specified')
-              }
-              default: { }
-              }
-          }
-          default: { File{ source => $source } }
-        }
-      }
-      default: { File{ content => $content } }
-    }
+  if $ensure != undef {
+    warning('The $ensure parameter to concat::fragment is deprecated and has no effect.')
+  }
 
-    file{"${fragdir}/fragments/${order}_${safe_name}":
-        ensure => $ensure,
-        mode   => $mode,
-        owner  => $owner,
-        group  => $group,
-        backup => $backup,
-        alias  => "concat_fragment_${name}",
-        notify => Exec["concat_${target}"]
-    }
+  validate_string($content)
+  if !(is_string($source) or is_array($source)) {
+    fail('$source is not a string or an Array.')
+  }
+
+  if !(is_string($order) or is_integer($order)) {
+    fail('$order is not a string or integer.')
+  } elsif (is_string($order) and $order =~ /[:\n\/]/) {
+    fail("Order cannot contain '/', ':', or '\n'.")
+  }
+
+  if ! ($content or $source) {
+    crit('No content, source or symlink specified')
+  } elsif ($content and $source) {
+    fail("Can't use 'source' and 'content' at the same time")
+  }
+
+  $safe_target_name = regsubst($target, '[/:\n\s\*\(\)]', '_', 'GM')
+
+  concat_fragment { $name:
+    target  => $target,
+    tag     => $safe_target_name,
+    order   => $order,
+    content => $content,
+    source  => $source,
+  }
 }
-
-# vi:tabstop=4:expandtab:ai
