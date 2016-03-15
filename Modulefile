@@ -1,8 +1,0 @@
-name    'cegeka-concat'
-version '0.0.2'
-source 'camptocamp'
-author 'cegeka'
-license 'UNKNOWN'
-summary 'UNKNOWN'
-description 'UNKNOWN'
-project_page 'UNKNOWN'
