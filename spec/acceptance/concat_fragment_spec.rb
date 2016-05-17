@@ -32,6 +32,10 @@ describe 'concat::fragment' do
     describe file '/etc/motd' do
       it { is_expected.to be_file }
       its(:content) { should contain /Puppet modules on this server/ }
+    end
+
+    describe file '/etc/motd' do
+      it { is_expected.to be_file }
       its(:content) { should contain /ABC ABC/ }
     end
 
