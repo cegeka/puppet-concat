@@ -281,3 +281,4 @@ For more information, see our [module contribution guide.](https://docs.puppetla
 ###Contributors
 
 To see who's already involved, see the [list of contributors.](https://github.com/puppetlabs/puppetlabs-concat/graphs/contributors)
+
