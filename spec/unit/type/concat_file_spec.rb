@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Puppet::Type.type(:concat_file) do
@@ -7,7 +9,7 @@ describe Puppet::Type.type(:concat_file) do
     let(:subject) { described_class.key_attributes }
 
     it 'contain only :path' do
-      is_expected.to eq([:path])
+      expect(subject).to eq([:path])
     end
   end
 
@@ -23,7 +25,7 @@ describe Puppet::Type.type(:concat_file) do
     subject { described_class.attrclass(:owner) }
 
     it 'inherits Puppet::Type::File::Owner' do
-      is_expected.to be < Puppet::Type::File::Owner
+      expect(subject).to be < Puppet::Type::File::Owner
     end
   end
 
@@ -31,7 +33,7 @@ describe Puppet::Type.type(:concat_file) do
     subject { described_class.attrclass(:group) }
 
     it 'inherits Puppet::Type::File::Group' do
-      is_expected.to be < Puppet::Type::File::Group
+      expect(subject).to be < Puppet::Type::File::Group
     end
   end
 
@@ -39,7 +41,7 @@ describe Puppet::Type.type(:concat_file) do
     subject { described_class.attrclass(:mode) }
 
     it 'inherits Puppet::Type::File::Mode' do
-      is_expected.to be < Puppet::Type::File::Mode
+      expect(subject).to be < Puppet::Type::File::Mode
     end
   end
 
@@ -62,12 +64,12 @@ describe Puppet::Type.type(:concat_file) do
   describe 'parameter :backup' do
     it 'accepts true (TrueClass) as a value' do
       resource[:backup] = true
-      expect(resource[:backup]).to eq(true)
+      expect(resource[:backup]).to be(true)
     end
 
     it 'accepts false (FalseClass) as a value' do
       resource[:backup] = false
-      expect(resource[:backup]).to eq(false)
+      expect(resource[:backup]).to be(false)
     end
 
     it 'accepts "foo" as a value' do
@@ -146,5 +148,9 @@ describe Puppet::Type.type(:concat_file) do
     it 'does not accept "bar" as a value' do
       expect { resource[:format] = 'bar' }.to raise_error(%r{Invalid value "bar"})
     end
+  end
+
+  describe 'parameter :create_empty_file' do
+    it_behaves_like 'Puppet::Parameter::Boolean', :create_empty_file
   end
 end

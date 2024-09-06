@@ -16,33 +16,22 @@
 # @param target
 #   Specifies the destination file of the fragment. Valid options: a string containing the path or title of the parent concat resource.
 #
-define concat::fragment(
-  String                             $target,
-  Optional[Any]                      $content = undef,
-  Optional[Variant[String, Array]]   $source  = undef,
-  Variant[String, Integer]           $order   = '10',
+define concat::fragment (
+  String                                                 $target,
+  Optional[Variant[Sensitive[String], String, Deferred]] $content = undef,
+  Optional[Variant[String, Array]]                       $source  = undef,
+  Variant[String, Integer]                               $order   = '10',
 ) {
   $resource = 'Concat::Fragment'
 
   if ($order =~ String and $order =~ /[:\n\/]/) {
-    fail(translate("%{_resource}['%{_title}']: 'order' cannot contain '/', ':', or '\\n'.", {'_resource' => $resource, '_title' => $title}))
+    fail("${resource}['${title}']: 'order' cannot contain '/', ':', or '\\n'.")
   }
 
   if ! ($content or $source) {
     crit('No content, source or symlink specified')
   } elsif ($content and $source) {
-    fail(translate("%{_resource}['%{_title}']: Can't use 'source' and 'content' at the same time.", {'_resource' => $resource, '_title' => $title}))
-  }
-
-  # $serverversion is empty on 'puppet apply' runs. Just use clientversion.
-  $_serverversion    = getvar('serverversion') ? {
-    undef   => $clientversion,
-    default => $serverversion,
-  }
-  if versioncmp($clientversion, '6.0') >= 0 and versioncmp($_serverversion, '6.0') >= 0 {
-    assert_type(Optional[Variant[String, Deferred]], $content)
-  } else {
-    assert_type(Optional[String], $content)
+    fail("${resource}['${title}']: Can't use 'source' and 'content' at the same time.")
   }
 
   $safe_target_name = regsubst($target, '[\\\\/:~\n\s\+\*\(\)@]', '_', 'GM')

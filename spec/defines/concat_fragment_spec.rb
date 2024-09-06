@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'concat::fragment' do
@@ -7,7 +9,7 @@ describe 'concat::fragment' do
     p = {
       content: nil,
       source: nil,
-      order: 10,
+      order: 10
     }.merge(params)
 
     let(:title) { title }
@@ -17,13 +19,15 @@ describe 'concat::fragment' do
     end
 
     it do
-      is_expected.to contain_concat(p[:target])
+      expect(subject).to contain_concat(p[:target])
     end
+
     it do
-      is_expected.to contain_concat_file(p[:target])
+      expect(subject).to contain_concat_file(p[:target])
     end
+
     it do
-      is_expected.to contain_concat_fragment(title)
+      expect(subject).to contain_concat_fragment(title)
     end
   end
 
@@ -62,12 +66,22 @@ describe 'concat::fragment' do
       end
     end
 
+    context 'when Sensitive' do
+      let(:title) { 'authentication' }
+      let(:content) { sensitive('password') }
+      let(:params) { { content: content, target: '/etc/authentication' } }
+
+      it do
+        expect(subject).to contain_concat_fragment(title).with(content: content)
+      end
+    end
+
     context 'when false' do
       let(:title) { 'motd_header' }
       let(:params) { { content: false, target: '/etc/motd' } }
 
       it 'fails' do
-        expect { catalogue }.to raise_error(Puppet::Error, %r{expects a value of type Undef( or String|, String, or Deferred), got Boolean})
+        expect { catalogue }.to raise_error(Puppet::Error, %r{expects a value of type Undef, Sensitive\[String\], String, or Deferred, got Boolean})
       end
     end
   end
@@ -117,6 +131,7 @@ describe 'concat::fragment' do
         expect { catalogue }.to raise_error(Puppet::Error, %r{cannot contain})
       end
     end
+
     context 'when 23/456' do
       let(:title) { 'motd_header' }
       let(:params) { { order: '123/456', target: '/etc/motd' } }
@@ -125,6 +140,7 @@ describe 'concat::fragment' do
         expect { catalogue }.to raise_error(Puppet::Error, %r{cannot contain})
       end
     end
+
     context 'when 123\n456' do
       let(:title) { 'motd_header' }
       let(:params) { { order: "123\n456", target: '/etc/motd' } }
@@ -143,12 +159,12 @@ describe 'concat::fragment' do
         {
           target: '/etc/motd',
           source: '/foo',
-          content: 'bar',
+          content: 'bar'
         }
       end
 
       it 'fails' do
-        expect { catalogue }.to raise_error(Puppet::Error, %r{Can\'t use \'source\' and \'content\' at the same time}m)
+        expect { catalogue }.to raise_error(Puppet::Error, %r{Can't use 'source' and 'content' at the same time}m)
       end
     end
   end
